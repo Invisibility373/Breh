@@ -2,9 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).send('Method Not Allowed');
-  }
+  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
   const { username } = req.body;
 
@@ -12,21 +10,22 @@ export default async function handler(req, res) {
     return res.status(400).send('Missing username');
   }
 
-  const filePath = path.join('/tmp', `${username}.txt`);
+  const dir = '/tmp';
 
   try {
-    // Try to read the file
-    const content = await fs.promises.readFile(filePath, 'utf8');
+    const files = await fs.promises.readdir(dir);
 
-    // File exists — send back success + content
-    res.status(200).json({ exists: true, content });
-  } catch (err) {
-    if (err.code === 'ENOENT') {
-      // File does not exist
-      res.status(404).json({ exists: false, message: 'File not found' });
-    } else {
-      // Some other error
-      res.status(500).send('Server error');
+    // Filter files for this username
+    const userTriggers = files
+      .filter(f => f.startsWith(username + '-'))
+      .map(f => f.replace(username + '-', '').replace('.txt', ''));
+
+    if (userTriggers.length === 0) {
+      return res.status(404).json({ exists: false, message: 'No triggers found' });
     }
+
+    res.status(200).json({ exists: true, triggerIds: userTriggers });
+  } catch (err) {
+    res.status(500).send('Server error');
   }
 }
