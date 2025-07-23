@@ -1,20 +1,26 @@
-// api/trigger.js
+import fs from 'fs';
+import path from 'path';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).send('Method Not Allowed');
   }
 
-  const { username, html } = req.body;
+  const { username } = req.body;
 
-  if (!username ) {
-    return res.status(400).send('Missing username or content');
+  if (!username) {
+    return res.status(400).send('Missing username');
   }
 
-  console.log(`✅ Triggered for ${username}`);
+  const filePath = path.join('/tmp', `${username}.txt`);
+  const content = `User: ${username}`;
 
-  // Optional: Simulate saving the data to disk or elsewhere
-  // You can't use fs.writeFile like in Express on Vercel, but you can log or forward the data
-
-  res.status(200).send('Trigger received');
+  try {
+    await fs.promises.writeFile(filePath, content);
+    console.log(`File created at ${filePath}`);
+    res.status(200).send(`File created for ${username}`);
+  } catch (err) {
+    console.error('File write error:', err);
+    res.status(500).send('Failed to write file');
+  }
 }
