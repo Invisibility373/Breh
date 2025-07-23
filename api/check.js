@@ -15,7 +15,6 @@ export default async function handler(req, res) {
   try {
     const files = await fs.promises.readdir(dir);
 
-    // Filter files for this username
     const userTriggers = files
       .filter(f => f.startsWith(username + '-'))
       .map(f => f.replace(username + '-', '').replace('.txt', ''));
@@ -26,6 +25,7 @@ export default async function handler(req, res) {
 
     res.status(200).json({ exists: true, triggerIds: userTriggers });
   } catch (err) {
+    console.error(err);
     res.status(500).send('Server error');
   }
 }
