@@ -11,12 +11,13 @@ export default async function handler(req, res) {
   }
 
   const filePath = path.join('/tmp', `${username}-${triggerId}.txt`);
-  const content = `User: ${username}\nTrigger ID: ${triggerId}`;
+  const content = `Trigger for user: ${username}\nTrigger ID: ${triggerId}\nTime: ${new Date().toISOString()}`;
 
   try {
     await fs.promises.writeFile(filePath, content);
     res.status(200).send('Trigger saved');
   } catch (err) {
+    console.error(err);
     res.status(500).send('Error saving trigger');
   }
 }
