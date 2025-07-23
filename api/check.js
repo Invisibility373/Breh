@@ -1,7 +1,7 @@
-export default async function handler(req, res) {
-  const fs = require("fs");
-  const path = require("path");
+import fs from "fs";
+import path from "path";
 
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).send("Method Not Allowed");
   }
