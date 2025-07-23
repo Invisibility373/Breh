@@ -1,0 +1,12 @@
+{
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "methods": ["GET", "POST"],
+      "headers": {
+        "Cache-Control": "no-cache"
+      },
+      "dest": "/api/$1"
+    }
+  ]
+}
