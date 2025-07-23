@@ -7,20 +7,25 @@ export default async function handler(req, res) {
   }
 
   const { username } = req.body;
-
   if (!username) {
     return res.status(400).send('Missing username');
   }
 
   const filePath = path.join('/tmp', `${username}.txt`);
-  const content = `User: ${username}`;
+  const fileContent = `This is a file for user: ${username}`;
 
   try {
-    await fs.promises.writeFile(filePath, content);
-    console.log(`File created at ${filePath}`);
-    res.status(200).send(`File created for ${username}`);
-  } catch (err) {
-    console.error('File write error:', err);
-    res.status(500).send('Failed to write file');
+    // Write file to /tmp
+    await fs.promises.writeFile(filePath, fileContent);
+
+    // Read file back
+    const data = await fs.promises.readFile(filePath, 'utf8');
+
+    console.log(`File content read: ${data}`);
+
+    res.status(200).json({ message: `File created and read successfully`, content: data });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('File write/read failed');
   }
 }
