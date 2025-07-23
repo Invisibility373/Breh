@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   const { username, html } = req.body;
 
-  if (!username || !html) {
+  if (!username ) {
     return res.status(400).send('Missing username or content');
   }
 
