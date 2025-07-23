@@ -7,7 +7,9 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 let trigger = "";
-
+app.get('/', (req, res) => {
+  res.send('🎉 Server is up and running!');
+});
 // POST /trigger
 app.post('/trigger', (req, res) => {
   const { username } = req.body;
