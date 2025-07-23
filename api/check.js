@@ -8,13 +8,12 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    const username = body.username;
 
-    if (!username) {
-      return res.status(400).send("Missing username");
+    if (!body.username) {
+      return res.status(400).send("Missing username in request");
     }
 
-    const filePath = path.join("/tmp", `${username}.txt`);
+    const filePath = path.join("/tmp", `${body.username}.txt`);
 
     if (fs.existsSync(filePath)) {
       return res.status(200).json({ found: true });
