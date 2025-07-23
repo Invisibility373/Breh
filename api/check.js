@@ -1,32 +1,28 @@
-export default function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).send('Method Not Allowed');
-  }
+export default async function handler(req, res) {
+  const fs = require("fs");
+  const path = require("path");
 
-  let username = '';
+  if (req.method !== "POST") {
+    return res.status(405).send("Method Not Allowed");
+  }
 
   try {
-    if (typeof req.body === 'string') {
-      // Body is raw text or JSON string — parse it
-      const data = JSON.parse(req.body);
-      username = data.username;
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const username = body.username;
+
+    if (!username) {
+      return res.status(400).send("Missing username");
+    }
+
+    const filePath = path.join("/tmp", `${username}.txt`);
+
+    if (fs.existsSync(filePath)) {
+      return res.status(200).json({ found: true });
     } else {
-      // Vercel parses JSON automatically
-      username = req.body.username;
+      return res.status(200).json({ found: false });
     }
   } catch (err) {
-    return res.status(400).send('Invalid JSON');
+    console.error("❌ Server error:", err);
+    return res.status(500).send("Internal Server Error");
   }
-
-  if (!username) {
-    return res.status(400).send('Missing username');
-  }
-
-  // Write username to a file in /tmp
-  const fs = require('fs');
-  const path = `/tmp/${username}.txt`;
-
-  fs.writeFileSync(path, `Checked at ${new Date().toISOString()}`);
-
-  return res.status(200).send(`Username ${username} stored.`);
 }
